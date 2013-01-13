@@ -10,7 +10,10 @@ def brute_force(input_string, perm_length):
 
     solution_found = False
     perm_sets = [frozenset([input_string])]
+    iter_num = 0
     while not solution_found:
+        iter_num += 1
+        print 'Round {0}'.format(iter_num)
         max_perms_solved = 0
         for fset in perm_sets:
             temp_set = set(perms_3)
@@ -104,7 +107,7 @@ test_solution = ['ABCEFHIJL','ACBILJEHF','FEHBACJIL','FHEJLIBCA',
 
 #check_solution(test_solution, 3)
 
-bf = brute_force('ABCDE', 3)
+bf = brute_force('ABCDEFG', 3)
 for a in bf:
     print a
 print len(bf)
