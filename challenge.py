@@ -2,13 +2,6 @@ from itertools import permutations, combinations
 from math import factorial
 from pprint import pprint
 
-def get_perm_solution(input_string, perm_length):
-    perms = list(permutations(input_string, perm_length))
-
-def find_best_perm(letter_set, perms_left, cur_str=''):
-    if not letter_set:
-        return cur_str
-
 def brute_force(input_string, perm_length):
     perms_3 = set(permutations(input_string, perm_length))
 
@@ -16,12 +9,48 @@ def brute_force(input_string, perm_length):
     perms_3.difference_update(set(combinations(input_string, perm_length)))
 
     solution_found = False
-    num_perms = 5
+    perm_sets = [frozenset([input_string])]
     while not solution_found:
-        big_list = list(permutations(list(permutations(input_string)), num_perms))
-        print len(big_list)
-        solution_found = True
+        max_perms_solved = 0
+        for fset in perm_sets:
+            temp_set = set(perms_3)
+            for a in fset:
+                temp_set.difference_update(a)
+            next_best, perms_solved = _find_next_best(temp_set, list(fset), input_string, perm_length)
+            if perms_solved > max_perms_solved:
+                new_perm_set = set()
+                max_perms_solved = perms_solved
+            if perms_solved == max_perms_solved and perms_solved > 0:
+                for i in next_best:
+                    new_perm_set.add(frozenset(fset.union({i})))
+            del temp_set
 
+        perm_sets = list(new_perm_set)
+
+        if max_perms_solved == 0:
+            solution_found = True
+
+    return perm_sets
+
+def _find_next_best(perm_set, current_list, input_string, perm_length):
+
+    for i in current_list:
+        perm_set.difference_update(set(combinations(i, perm_length)))
+
+    big_list = [''.join(a) for a in permutations(input_string)]
+
+    max_perms_solved = 0
+    best_perm_list = []
+    for perm in big_list:
+        solved_perms = set(combinations(perm, perm_length))
+        num_solved_perms = len(perm_set.intersection(solved_perms))
+        if num_solved_perms > max_perms_solved:
+            del best_perm_list[:]
+            max_perms_solved = num_solved_perms
+        if num_solved_perms == max_perms_solved:
+            best_perm_list.append(perm)
+
+    return best_perm_list,max_perms_solved
 
 def nCr(n,r):
     f = factorial
@@ -75,4 +104,13 @@ test_solution = ['ABCEFHIJL','ACBILJEHF','FEHBACJIL','FHEJLIBCA',
 
 #check_solution(test_solution, 3)
 
-brute_force('EISH', 3)
+bf = brute_force('ABCDE', 3)
+for a in bf:
+    print a
+print len(bf)
+
+#a = brute_force('EIHS', 3)
+#
+#pprint(a)
+#print len(a[0])
+#print len(a)
